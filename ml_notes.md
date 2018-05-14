@@ -155,6 +155,7 @@
 - Idea: find the best plane that separate data by maximise the margin to each of example
 
 - Derivation (highly recommend reading: [Stanford CS229 Notes](http://cs229.stanford.edu/notes/cs229-notes3.pdf))
+
   - Functional Margin: $\hat{\gamma}_i =y_i (w^Tx_i + b)$
 
   - Geometric Margin (norm of vector AB), and it satisfy following function
@@ -380,7 +381,39 @@ For example above, we **don't** need to actually compute the inner product of $\
 
     ![alt text](nn_auto_encoder.png "Logo Title Text 1")
 
-# Transfer Learning
+
+
+### Non-linear Activation Functions
+
+- Sigmoid: $\frac{1}{1+e^{-u}}$ [0, 1]
+- Tanh: [-1, 1]
+- ReLU: $max(0, w*x+b)$. Cap at zero.  Faster, no gradient saturation problem like Sigmoid or Tanh for large values (nearly flat curve at the very left or very right on plot)
+  - Variations
+    1. Leaky ReLU: if $ x > 0, f(x)=  x$, else $f(x)=ax (0<a<1)$
+    2. Smoothed ReLU: $log(exp(x)+1)$. (Notice $log(exp(x))=x$))
+  - ![alt text](relu.png "Logo Title Text 1")
+
+## Techniques to Avoid Overfitting
+
+1. Regularization: L1 or L2 on $W$
+
+2. Early Stopping: Stop training when held-out accuracy no longer improves
+
+3. **Dropout**: Randomly drop neural and their connections in training process;  in testing, use full networks but with weights scaled by the probability that they were present during training. 
+
+   But why Dropout works?
+
+   Answer: 
+
+    	1. Dropout is similar to making random perturbations in the input -> reduce variance
+   	2. Prevents neuron co-adaptation. Neurons take values rely on other neurons for correct prediction
+   	3. Works like ensemble training. 
+
+
+
+#Other Topics
+
+##Transfer Learning
 
 Pretrain ConvNet with a large dataset and then use it as one of following 3 ways:
 
@@ -389,65 +422,6 @@ Pretrain ConvNet with a large dataset and then use it as one of following 3 ways
 	3. **Pretrained models**. Since modern ConvNets take 2-3 weeks to train across multiple GPUs on ImageNet, it is common to see people release their final ConvNet checkpoints for the benefit of others who can use the networks for fine-tuning. 
 
 More to look at http://cs231n.github.io/transfer-learning/
-
-##Dimension Reduction
-
-###Background
-
-####Covariance
-
- It is a measure of the extent to which corresponding elements from two sets of ordered data move in the same direction. Formula is shown above denoted by *cov(x,y)* as the covariance of *x* and *y*.
-
-$cov(x, y) = \frac{\sum(x_i - \bar{x}) (y_i -\bar{y})}{N}$
-
-![covariance](/Users/jiaojingping/Developer/ml_notes/covariance.png)
-
-
-
-#### Eigen Value and Eigen Vector
-
-http://setosa.io/ev/eigenvectors-and-eigenvalues/
-
-Assume $A$ is matrix and $v$ is a vector. $Av$ Is essentially transform $v$ by applying transformation $A$. 
-
-Then if $Av = \lambda v$ for some scalar value $\lambda$, it means transformation of $v$ by $A$ is only changing magnitude of $v$ (stretching or shrinking $ v$ while maintaining its direction).
-
-Given a fix $A$, we can find the its eigen vectors (by selecting different $\lambda$) .
-
-![covariance](/Users/jiaojingping/Developer/ml_notes/eigen_val_example.png)
-
-### PCA
-
-####Intuitions
-
-- Firstly, What is the goal of PCA ?
-
-  find some low independent dimension of projected data, such that the error from reconstruction of the original data error by projected data is minimised. 
-
-
-- Then How to minimise reconstruction error?
-
-  Reconstruction error is minimised when variance of projected data on each dimension is maximised. Therefore, we want to transform the original data points such that the covariance matrix of transformed data points is a diagonal matrix (zero covariance and high variance ). 
-
-- What is Covariance Matrix? And why it should be diagonal
-
-  We want the data to be spread out i.e. it should have high variance along dimensions. Also we want to remove correlated dimensions i.e. covariance among the dimensions should be zero (they should be linearly independent). Therefore, our covariance matrix should have -
-  - large numbers as the main diagonal elements.
-  - zero values as the off diagonal elements.![covariance](./cov_equation.png)![covariance](./cov_mat.png)
-
-- Finally, how should we ensure that projected data's covariance matrix is diagonal?
-
-  If we find the matrix of eigen vectors of $C_x$ and use that as $P$ ($P$ is used for transforming $X$ to $Y$, see the image below) , then $C_y$ (covariance of transformed points) will be a diagonal matrix. Hence $Y$ will be the set of new/transformed data points.
-
-  ![covariance](./pca_equation.png)
-
-#### Processpc
-
-1. Calculate the covariance matrix *X* of data points.
-2. Calculate eigen vectors and corresponding eigen values.
-3. Sort the eigen vectors according to their eigen values in decreasing order.
-4. Choose first k eigen vectors and that will be the new k dimensions.
-5. Transform the original n dimensional data points into k dimensions.
 
 
 
@@ -527,3 +501,159 @@ Communication between the clients and the servers is done with a simple, high-pe
 5. Deploy
    - Evaluate and improve
    - **Interpret model and build insight to make suggestions to relevant stake-holders**
+
+
+
+
+
+## Clustering 
+
+Two parameter overall:
+
+$\mu_k$ : cluster center. Defined by mean of examples in that cluster
+
+$r_{nk}$ : whether $nth$ data is in $kth$ cluster
+
+### K-Means
+
+1. Select $r$ that minimizes J with fixed $\mu$
+2. Select $\mu$ that minimizes J with fixed $r$
+
+Problems:
+
+- Slow: O(TKNM), where T is number of iteration, K is number of clusters, N is number of data, M is vector dimension(due to calculate distance of data to $\mu$)
+- Hard decision boundary -> Gaussian Mixture Model
+
+### GMM
+
+Assume each example is generated by a mixture of Gaussian distributions.
+
+We still have two set of parameters:
+
+1. $\pi_{k}$ = prior of this Gaussian, $\mu_k$ and $\sigma_k$ (mean and covariance of Gaussian)
+2. $r_{nk}$
+
+![enter image description here](./gmm.png)
+
+Problem:
+
+- Slower than K-Mean: more iteration to converge and more expensive in each iteration
+- Mode-Collapse: one data is isolated and become its own Gaussian
+- Very non-convex likelyhood
+
+# EM
+
+![Screen Shot 2018-05-11 at 8.39.16 PM](./em_eq.png)
+
+Note:
+
+- $\mathcal{L}(q,\theta)$ Is a function of $q$ and $\theta$. 
+- $KL(q||p)$ Measures the distribution difference in $q(Z)$ and $
+- This equation is able to be proved
+
+## E-step
+
+In E step, we fix $\theta$, and let it be $\theta^{old}$ .   
+
+We will try to maximise the lower bound of $\log p(X|\theta)$, which is $\mathcal{L}$.
+
+Since likelihood of $p(X|\theta)$ is only depend on $\theta$, it is a constant in this step.  Keeping $\log p(X|\theta)$ Constant, if we minimise $KL(q||p)$ by changing $q(Z)$, $\mathcal{L}(q, \theta)$ has to increase.  Therefore, the likelihood of our approximate distribution $q(Z)$ will increase when $KL(q||p)$ is minimised when $q(Z)=p(Z|X, \theta^{old})$. 
+
+![Screen Shot 2018-05-11 at 8.39.16 PM](./em_estep.png)
+
+![Screen Shot 2018-05-11 at 8.39.16 PM](./em_estep_eq.png)
+
+##M-step
+
+In M step, we fix $q(Z)$.
+
+We will still try to maximise the lower bound of $\log p(X|\theta)$, which is $\mathcal{L}$. But this time,  $\log p(X|\theta)$ is not a constant. 
+
+![em_mstep](./em_mstep.png)
+
+![em_mstep_eq](./em_mstep_eq.png)
+
+###M-step's Q-function
+
+#### Background: Entropy and Cross-Entropy
+
+Entropy:$H(p)=-\sum_ip(x_i)\log(p(x_i))$
+
+Cross-entropy:$H(p)=-\sum_ip(x_i)\log(q(x_i))$
+
+Cross-entropy measures the number of bits (or nats) is needed to identify an event from a set of possible events if the coding scheme is based on distribution q instead of the true one, p
+
+
+
+So after E step, we made $q(Z) = p(Z|X, \theta)$, substitute this in $\mathcal{L}$, we get
+
+![em_mstep_eq](./q_func_1.png)
+
+Whereby first item is negative cross entropy between $p(X,Z|\theta)$ and $p(Z|X, \theta^{old})$
+
+Second term is constant 
+
+![em_mstep_eq](./q_func_2.png)
+
+
+
+
+
+## Dimension Reduction
+
+### Background
+
+#### Covariance
+
+ It is a measure of the extent to which corresponding elements from two sets of ordered data move in the same direction. Formula is shown above denoted by *cov(x,y)* as the covariance of *x* and *y*.
+
+$cov(x, y) = \frac{\sum(x_i - \bar{x}) (y_i -\bar{y})}{N}$
+
+![covariance](./covariance.png)
+
+
+
+#### Eigen Value and Eigen Vector
+
+http://setosa.io/ev/eigenvectors-and-eigenvalues/
+
+Assume $A$ is matrix and $v$ is a vector. $Av$ Is essentially transform $v$ by applying transformation $A$. 
+
+Then if $Av = \lambda v$ for some scalar value $\lambda$, it means transformation of $v$ by $A$ is only changing magnitude of $v$ (stretching or shrinking $ v$ while maintaining its direction).
+
+Given a fix $A$, we can find the its eigen vectors (by selecting different $\lambda$) .
+
+![covariance](./eigen_val_example.png)
+
+### PCA
+
+#### Intuitions
+
+- Firstly, What is the goal of PCA ?
+
+  find some low independent dimension of projected data, such that the error from reconstruction of the original data error by projected data is minimised. 
+
+- Then How to minimise reconstruction error?
+
+  Reconstruction error is minimised when variance of projected data on each dimension is maximised. Therefore, we want to transform the original data points such that the covariance matrix of transformed data points is a diagonal matrix (zero covariance and high variance ). 
+
+- What is Covariance Matrix? And why it should be diagonal
+
+  We want the data to be spread out i.e. it should have high variance along dimensions. Also we want to remove correlated dimensions i.e. covariance among the dimensions should be zero (they should be linearly independent). Therefore, our covariance matrix should have -
+
+  - large numbers as the main diagonal elements.
+  - zero values as the off diagonal elements.![covariance](/Users/jiaojingping/Dropbox/Study/Notes/ml_notes/cov_equation.png)![covariance](/Users/jiaojingping/Dropbox/Study/Notes/ml_notes/cov_mat.png)
+
+- Finally, how should we ensure that projected data's covariance matrix is diagonal?
+
+  If we find the matrix of eigen vectors of $C_x$ and use that as $P$ ($P$ is used for transforming $X$ to $Y$, see the image below) , then $C_y$ (covariance of transformed points) will be a diagonal matrix. Hence $Y$ will be the set of new/transformed data points.
+
+  ![covariance](/Users/jiaojingping/Dropbox/Study/Notes/ml_notes/pca_equation.png)
+
+#### Process
+
+1. Calculate the covariance matrix *X* of data points.
+2. Calculate eigen vectors and corresponding eigen values.
+3. Sort the eigen vectors according to their eigen values in decreasing order.
+4. Choose first k eigen vectors and that will be the new k dimensions.
+5. Transform the original n dimensional data points into k dimensions.
