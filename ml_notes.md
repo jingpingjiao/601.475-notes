@@ -16,17 +16,19 @@
 
     he AUC for a classifier with no power, essentially random guessing, is 0.5, because the curve follows the diagonal. The AUC for that mythical being, the perfect classifier, is 1.0. Most classifiers have AUCs that fall somewhere between these two values.
 
+    True Positive Rate/False Positive
+
   - Confusion Matrix
 
 - Regression
 
   - Mean Absolute Error
+
   - Mean Square Error. It gives more punishment for large error
-  - R^2 (R Sqaure)
 
+  - R^2 (R Sqaure): it is the percentage of the response variable variation that is explained by a linear model. 
 
-
-
+    $R-squared =Explained variation / Total variation$
 
 # Model
 
@@ -59,8 +61,6 @@
 
   $BIC = DOF(\theta)log N - 2logP(D|\theta)$ : penalise high DOF model, mitigated by its likelyhood 
 
-
-
 # Linear Regression
 
 - Assumptions:
@@ -90,7 +90,7 @@
 
   - Less regularization -> more overfitting -> more variance
 
-    ​
+    
 
 # KNN
 
@@ -106,7 +106,7 @@
 
   - K too high: underfit
 
-    ​
+    
 
 # Logistic Regression
 
@@ -118,7 +118,7 @@
   - then we have $\frac{p}{1-p} = e^{w^Tx}$
   - solve for $p$
 - Soft-max interpretation
-  - $\frac{e^{G(x,y)}}{e^{G(x)} + e^{0}}$
+  - $\frac{e^{G(x)}}{e^{G(x)} + e^{0}}$
 - Loss function:
   - LIkelyhood function: MLE of every data $\sum log[y_i P(y=1|x_i) + (1-y_i)P(y_i=0|x_i)]$
 - Optimization:
@@ -284,11 +284,37 @@ For example above, we **don't** need to actually compute the inner product of $\
 
 # Ensemble Method
 
+## Boosting and Bagging:
+
+Both are ensemble methods to one strong model based on many weak learners.
+
+- Bagging: 
+
+  - Method: data resample + feature downsample
+
+- Boosting:
+
+  - Method: Learners are learned sequentially . Learners will adjust the way they learn based on earlier learner's error. 
+
+  ![alt text](bagging_boosting.png "Logo Title Text 1")
+
 ## Random Forrest
 
--  Data Sampling: With dataset of size N, create M different samples of size N by resampling wit replacement
-  - Bootstrapping and Bagging
--  Feature Sampling: random subset of feature at each node
+- Data Sampling: With dataset of size N, create M different samples of size N by resampling wit replacement
+  - Bootstrapping and Bagging:
+
+- Feature Sampling: random subset of feature at each node
+
+- Pros:  
+
+  1. Handles higher dimensionality data very well.
+
+  2. Handles missing values and maintains accuracy for missing data.
+
+-  Cons:
+
+   1. Greedy training
+   2. Inaccurate due to majority voting
 
 ## AdaBoost
 
@@ -325,7 +351,9 @@ For example above, we **don't** need to actually compute the inner product of $\
 - Idea: Diversity in classifiers, datasets
   - Data diversity: feature/instance bagging
 
+## Gradient Boosting
 
+- Intuition:  `gradient boosting` algorithm is to repetitively leverage the patterns in residuals and strengthen a model with weak predictions and make it better. Once we reach a stage that residuals do not have any pattern that could be modeled, we can stop modeling residuals (otherwise it might lead to overfitting). Algorithmically, we are minimizing our loss function, such that test loss reach its minima.
 
 # Neural Net
 
@@ -411,9 +439,9 @@ For example above, we **don't** need to actually compute the inner product of $\
 
 
 
-#Other Topics
+# Other Topics
 
-##Transfer Learning
+## Transfer Learning
 
 Pretrain ConvNet with a large dataset and then use it as one of following 3 ways:
 
@@ -422,89 +450,6 @@ Pretrain ConvNet with a large dataset and then use it as one of following 3 ways
 	3. **Pretrained models**. Since modern ConvNets take 2-3 weeks to train across multiple GPUs on ImageNet, it is common to see people release their final ConvNet checkpoints for the benefit of others who can use the networks for fine-tuning. 
 
 More to look at http://cs231n.github.io/transfer-learning/
-
-
-
-# Time Serie
-
-## Generalised Additive Model(GAM)
-
-The principle behind GAMs is similar to that of [regression](https://algobeans.com/2016/01/31/regression-correlation-tutorial/), except that instead of summing effects of *individual predictors*, GAMs are a sum of *smooth functions*. Functions allow us to model more complex patterns, and they can be averaged to obtain smoothed curves that are more generalizable.
-
-
-
-### Why GAM?
-
-- Interpretability 
-- Non-parametric, avoids the pitfalls of dealing higher order polynomial terms in linear models
-
-### Project
-
-- FB Prophet Package
-- Tesla vs. General Motor(GM)
-
-
-
-# Data Science Stack
-
-!![kafka](/Users/jiaojingping/Developer/601.475-notes/kafka.png)
-
-## Kafka
-
-**Key takeaways:**
-
-1. Kafka maintains feeds of messages in categories called topics.
-2. We'll call processes that publish messages to a Kafka topic producers.
-3. We'll call processes that subscribe to topics and process the feed of published messages consumers..
-4. Kafka is run as a cluster comprised of one or more servers each of which is called a broker.
-
-[![enter image description here](https://i.stack.imgur.com/lnhn5.png)](https://i.stack.imgur.com/lnhn5.png)
-
-Communication between the clients and the servers is done with a simple, high-performance, language agnostic TCP protocol.
-
-**Use Cases:**
-
-1. **Messaging**: *Kafka works well as a replacement for a more traditional message broker*. In this domain Kafka is comparable to traditional messaging systems such as ActiveMQ or RabbitMQ
-2. **Website Activity Tracking:** The original use case for Kafka was to be able to rebuild a user activity tracking pipeline as a set of real-time publish-subscribe feeds
-3. **Metrics**: Kafka is often used for operational monitoring data, which involves aggregating statistics from distributed applications to produce centralized feeds of operational data
-4. **Log Aggregation**
-5. **Stream Processing**
-6. **Event sourcing** is a style of application design where state changes are logged as a time-ordered sequence of records.
-7. **Commit Log**: *Kafka can serve as a kind of external commit-log* for a distributed system. The log helps replicate data between nodes and acts as a re-syncing mechanism for failed nodes to restore their data
-
-
-
-## Churn User Analyse
-
-### Process
-
-1. Understand the problem
-   - **Who should be considered as churn user**
-   - Is ML the most efficient solution?  Would simple heuristic would do like a rule-based system?
-   - How interpretable should the system be?
-   - How the system is going to be used in future?
-   - Scalability?
-2. Understand data we get
-   - Visualize data to get a quick sense
-   - Understand statistical property of data
-   - Handle missing data
-   - Handle outliers
-3. Choose model
-   - Interpretability?
-   - Time/Space Constrain?
-   - Data assumption met for this model?
-   - Existing researches/solutions
-4. Developing
-   - **Baseline system**
-   - Feature Engineering
-   - Training and Tuning model
-5. Deploy
-   - Evaluate and improve
-   - **Interpret model and build insight to make suggestions to relevant stake-holders**
-
-
-
-
 
 ## Clustering 
 
@@ -642,13 +587,13 @@ Given a fix $A$, we can find the its eigen vectors (by selecting different $\lam
   We want the data to be spread out i.e. it should have high variance along dimensions. Also we want to remove correlated dimensions i.e. covariance among the dimensions should be zero (they should be linearly independent). Therefore, our covariance matrix should have -
 
   - large numbers as the main diagonal elements.
-  - zero values as the off diagonal elements.![covariance](/Users/jiaojingping/Dropbox/Study/Notes/ml_notes/cov_equation.png)![covariance](/Users/jiaojingping/Dropbox/Study/Notes/ml_notes/cov_mat.png)
+  - zero values as the off diagonal elements.![covariance](./cov_equation.png)![covariance](./cov_mat.png)
 
 - Finally, how should we ensure that projected data's covariance matrix is diagonal?
 
   If we find the matrix of eigen vectors of $C_x$ and use that as $P$ ($P$ is used for transforming $X$ to $Y$, see the image below) , then $C_y$ (covariance of transformed points) will be a diagonal matrix. Hence $Y$ will be the set of new/transformed data points.
 
-  ![covariance](/Users/jiaojingping/Dropbox/Study/Notes/ml_notes/pca_equation.png)
+  ![covariance](./pca_equation.png)
 
 #### Process
 
@@ -657,3 +602,165 @@ Given a fix $A$, we can find the its eigen vectors (by selecting different $\lam
 3. Sort the eigen vectors according to their eigen values in decreasing order.
 4. Choose first k eigen vectors and that will be the new k dimensions.
 5. Transform the original n dimensional data points into k dimensions.
+
+# Time Serie
+
+## Generalised Additive Model(GAM)
+
+The principle behind GAMs is similar to that of [regression](https://algobeans.com/2016/01/31/regression-correlation-tutorial/), except that instead of summing effects of *individual predictors*, GAMs are a sum of *smooth functions*. Functions allow us to model more complex patterns, and they can be averaged to obtain smoothed curves that are more generalizable.
+
+### Why GAM?
+
+- Interpretability 
+- Non-parametric, avoids the pitfalls of dealing higher order polynomial terms in linear models
+
+### Project
+
+- FB Prophet Package
+- Tesla vs. General Motor(GM)
+
+
+
+# Data Science Stack
+
+!![kafka](/Users/jd_jingpingjiao/Dropbox/Study/Notes/ml_notes/kafka.png)
+
+## Kafka
+
+**Key takeaways:**
+
+1. Kafka maintains feeds of messages in categories called topics.
+2. We'll call processes that publish messages to a Kafka topic producers.
+3. We'll call processes that subscribe to topics and process the feed of published messages consumers..
+4. Kafka is run as a cluster comprised of one or more servers each of which is called a broker.
+
+[![enter image description here](https://i.stack.imgur.com/lnhn5.png)](https://i.stack.imgur.com/lnhn5.png)
+
+Communication between the clients and the servers is done with a simple, high-performance, language agnostic TCP protocol.
+
+**Use Cases:**
+
+1. **Messaging**: *Kafka works well as a replacement for a more traditional message broker*. In this domain Kafka is comparable to traditional messaging systems such as ActiveMQ or RabbitMQ
+2. **Website Activity Tracking:** The original use case for Kafka was to be able to rebuild a user activity tracking pipeline as a set of real-time publish-subscribe feeds
+3. **Metrics**: Kafka is often used for operational monitoring data, which involves aggregating statistics from distributed applications to produce centralized feeds of operational data
+4. **Log Aggregation**
+5. **Stream Processing**
+6. **Event sourcing** is a style of application design where state changes are logged as a time-ordered sequence of records.
+7. **Commit Log**: *Kafka can serve as a kind of external commit-log* for a distributed system. The log helps replicate data between nodes and acts as a re-syncing mechanism for failed nodes to restore their data
+
+
+
+## Churn User Analyse
+
+### Process
+
+Overall: prediction model to predict who will be churn users in future based on data of historical churn users. 
+
+1. Understand the problem
+   - **Who should be considered as churn user**
+   - Is ML the most efficient solution?  Would simple heuristic would do like a rule-based system?
+   - How interpretable should the system be?
+   - How the system is going to be used in future?
+   - Scalability?
+2. Understand data we get
+   - Visualize data to get a quick sense
+   - Understand statistical property of data
+   - Handle missing data
+   - Handle outliers
+3. Choose model
+   - Interpretability?
+   - Time/Space Constrain?
+   - Data assumption met for this model?
+   - Existing researches/solutions
+4. Developing
+   - **Baseline system**
+   - Feature Engineering
+   - Training and Tuning model
+5. Deploy
+   - Evaluate and improve
+   - **Interpret model and build insight to make suggestions to relevant stake-holders**
+
+
+
+## AB-Testing
+
+Essentially a **causality** test on hypothesis, which we hope can gives us a measure on Return on Investiment (ROI).  -> Randomised Control Experiment
+
+### Process
+
+1. we first need to form our question as a **hypothesis**, 
+2. we then need to work out our **randomization strategy**, **sample size** 
+3. and finally our **method of measurement**.
+
+#### 1. Hypothesis
+
+- Null-hypothesis: there is **NO** difference between treatment and control group
+- Alternative hypothesis; there **is** difference
+
+A hypotheis should include: **P**opulation, **I**ntervention, **C**omparison, **O**utcome, **T**ime.
+
+E.g:
+
+- Population: individuals who have visited the Amazon.com site
+- Intervention: new website layout (Layout B)
+- Comparison: visitors receiving Layout A
+- Outcome: Conversion rate
+- Time: End of visit to Amazon.com
+
+#### 2. Randomization
+
+Randomization is important 
+
+1. to distribute co-variates evently
+
+   - **Co-variates** are factors that might influence your outcome variable, for example, visitor geolocation, gender and risk-appetite.
+
+2. eliminating statistical bias
+
+   - **Randomization bias** — bias due to poor randomization resulting in *unbalanced Treatment/Control groups*.
+
+     e.g most of our experiment participants belongs to a particular age group while we want to test the hypothesis on the whole population. 
+
+   - **Selection bias** — bias would also result if we were to allow visitors to assign *themselves* to Treatment/Control groups .
+
+     e.g this will happend if we allow user to select which control group they will be in. For example, visitors with more risk appetite and might select the new layout, but risk-appite people are more likely to buy our product. So in this case, we dont know whether our conversion rate increases due to the new layout because of the additional counfounder.
+
+## SQL vs NoSQL
+
+**The Scalability ** In most situations, SQL databases are vertically scalable, which means that you can increase the load on a single server by increasing things like CPU, RAM or SSD. NoSQL databases, on the other hand, are horizontally scalable. This means that you handle more traffic by sharding, or adding more servers in your NoSQL database. It’s like adding more floors to the same building versus adding more buildings to the neighborhood. The latter can ultimately become larger and more powerful, making NoSQL databases the preferred choice for large or ever-changing data sets.
+
+**The Structure**SQL databases are table-based, while NoSQL databases are either document-based, key-value pairs, graph databases or wide-column stores. This makes relational SQL databases a better option for applications that require multi-row transactions - such as an accounting system - or for legacy systems that were built for a relational structure.
+
+MySQL is a strong choice for any business that will benefit from its pre-defined structure and set schemas. For example, applications that require multi-row transactions - like accounting systems or systems that monitor inventory - or that run on legacy systems will thrive with the MySQL structure.
+
+- NoSQL
+  - **Dynamic schema:** As mentioned, this gives you flexibility to change your data schema without modifying any of your existing data.
+  - **Scalability:** MongoDB is horizontally scalable, which helps reduce the workload and scale your business with ease.
+  - **Manageability:** The database doesn’t require a database administrator. Since it is fairly user-friendly in this way, it can be used by both developers and administrators.
+  - **Speed:** It’s high-performing for simple queries.
+  - **Flexibility:** You can add new columns or fields on MongoDB without affecting existing rows or application performance.
+
+## Machine Learning Pipline
+
+1. Understand problem. (Metric, data, goals)
+2. Data visualization
+3. Data cleaning/handling missing data/identify outliers
+4. Build baseline 
+   1. test/dev/train split
+   2. tune hyperparameter
+   3. prevent overfitting
+      1. cut features
+      2. more data
+      3. Regularization
+   4. evaluate on test set
+5. Fasier model
+
+## ML Model Performance Improment
+
+1. **More Data!** Of course! This is almost always a good idea if you can afford it. It drives variance down (without a trade-off in bias) and allows you to use more flexible models.
+2. **Add More Features!** This is almost always a good idea too. Again, if you can afford it. Adding new features increases model flexibility and **decreases bias**(on the expense of variance). The only time when it’s not a good idea to add new features is when your data set is small in terms of data points and you can’t invest in #1 above.
+3. **Do Feature Selection.** Well, … only do it if you have a lot of features and not enough data points. Feature selection is almost the inverse of #2 above, and pulls your model in the opposite direction (decreasing variance on the expense of some bias) but the trade-off can be good if you do the feature selection methodically and only remove noisy and in-informative features. If you have enough data, most models can automatically handle noisy and uninformative features and you don’t need to do explicit feature selection. In this day and age of “Big Data” the need for explicit feature selection rarely arises. It is also worth noting that proper feature selection is non-trivial and computationally intensive.
+4. **Use Regularization.** This is the neater version of #3 and amounts to implicit feature selection. The specifics are beyond the scope for this post, but regularization tells your algorithm to try to use as few features as possible, or to not trust any single feature too much. Regularization relies on smart implementations of training algorithms and is usually the much preferred version of feature selection.
+5. [Bagging](http://en.wikipedia.org/wiki/Bootstrap_aggregating) is short for Bootstrap Aggregation. It uses several versions of the same model trained on slightly different samples of the training data to reduce variance without any noticeable effect on bias. Bagging could be computationally intensive esp. in terms of memory.
+6. [Boosting](http://en.wikipedia.org/wiki/Boosting_%28machine_learning%29) is a slightly more complicated concept and relies on training several models successively each trying to learn from the errors of the models preceding it. Boosting decreases bias and hardly affects variance (unless you are very sloppy). Again the price is computation time and memory size.
+7. **Use a more different class of models!** Of course you don’t have to do all the above if there is another type of models that is more suitable to your data set out-of-the-box. Changing the model class (e.g. from linear model to neural network) moves you to a different point in the space above. Some algorithms are just better suited to some data sets than others. Identifying the right type of models could be really tricky though!
